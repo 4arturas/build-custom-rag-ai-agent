@@ -29,8 +29,8 @@ async function simpleRagExample(userQuestion) {
   // const vectorStore = await HNSWLib.fromDocuments(splits, embeddings);
   // const retriever = vectorStore.asRetriever();
 
-    const vectorStore = await MemoryVectorStore.fromDocuments(splits, embeddings);
-    const retriever = vectorStore.asRetriever();
+  const vectorStore = await MemoryVectorStore.fromDocuments(splits, embeddings);
+  const retriever = vectorStore.asRetriever();
 
   console.log("3. RETRIEVE: Finding relevant documents for the question...");
   const relevantDocs = await retriever.invoke(userQuestion);

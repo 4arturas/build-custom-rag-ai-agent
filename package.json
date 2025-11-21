@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Custom RAG AI Agent using Deno, LangChain, and Ollama",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",

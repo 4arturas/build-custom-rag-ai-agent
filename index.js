@@ -4,7 +4,6 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { MessageGraph } from "@langchain/langgraph";
 import { END } from "@langchain/langgraph";
-import { Annotation } from "@langchain/langgraph";
 
 // Define models to be used
 const model = new ChatOllama({

@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "@langchain/community": "^0.2.20",
-    "@langchain/llms": "^0.2.4",
     "@langchain/core": "^0.2.11",
     "@langchain/langgraph": "^0.0.21",
     "langchain": "^0.2.5",

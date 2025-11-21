@@ -4,10 +4,13 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { END, START, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
-// Import document processing functions
+// Import document processing functions and tools
 import { loadDocumentsFromUrls, splitDocuments, createVectorStore } from "./documents.js";
 import { gradeDocuments } from "./grader.js";
+import { retrieverTool } from "./tools.js";
 
 // Define the state structure for our RAG agent
 const StateAnnotation = {
@@ -61,17 +64,59 @@ async function gradeDocumentsNode(state) {
   return { keys: { filtered_docs: filteredDocs } };
 }
 
+// Define the tool schema using Zod
+const toolSchema = z.object({
+  action: z.string().describe("The name of the tool to use"),
+  action_input: z.string().describe("The input for the tool"),
+});
+
 // Function for the agent to decide next action
 async function agent(state) {
   const { messages } = state;
+
+  // Create a prompt for the agent to decide what to do
+  const prompt = PromptTemplate.fromTemplate(`
+    You are a research assistant for question-answering tasks.
+    Use the following pieces of context to answer the question at the end.
+    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+    {context}
+
+    Question: {question}
+
+    Given the context and question, decide whether to:
+    1. Generate an answer directly, or
+    2. Use the document_retriever tool to search for more information
+
+    Respond with your choice and reasoning.
+  `);
+
+  // In a real implementation, we'd use a more sophisticated approach
+  // For now, let's use a simple approach to determine if we need to retrieve
   const lastMessage = messages[messages.length - 1].content;
+  const needsRetrieval = lastMessage.toLowerCase().includes("what") ||
+                        lastMessage.toLowerCase().includes("who") ||
+                        lastMessage.toLowerCase().includes("how") ||
+                        lastMessage.toLowerCase().includes("explain");
 
-  // For a simple implementation, we'll return a response
-  const response = await generationModel.invoke([
-    { role: "user", content: `Respond to this query: ${lastMessage}` }
-  ]);
+  // If it's a factual question, suggest using the tool
+  if (needsRetrieval) {
+    // Return a message indicating we want to use the retriever tool
+    return {
+      messages: [{
+        role: "assistant",
+        content: "Need to retrieve information to answer this question.",
+        tool_calls: [{ name: "document_retriever", args: { query: lastMessage } }]
+      }]
+    };
+  } else {
+    // For non-factual questions, try to generate a response directly
+    const response = await generationModel.invoke([
+      { role: "user", content: `Respond to this query: ${lastMessage}` }
+    ]);
 
-  return { messages: [response] };
+    return { messages: [response] };
+  }
 }
 
 // Function to rewrite query for better retrieval
@@ -149,7 +194,9 @@ async function retrieve(state) {
   }
 }
 
-// Create the workflow graph
+// Create the workflow graph - following the tutorial pattern:
+// agent decides -> if needs retrieval, go to retrieve -> grade docs -> generate
+// if no retrieval needed, go directly to generate
 const workflow = new StateGraph(StateAnnotation)
   .addNode("agent", agent)
   .addNode("retrieve", retrieve)
@@ -159,7 +206,18 @@ const workflow = new StateGraph(StateAnnotation)
   .addEdge(START, "agent")
   .addConditionalEdges(
     "agent",
-    shouldRetrieve,
+    // Check if the agent decided to use tools (retrieve)
+    (state) => {
+      const { messages } = state;
+      const lastMessage = messages[messages.length - 1];
+
+      // If the agent has tool calls, we need to retrieve documents
+      if (lastMessage.tool_calls && lastMessage.tool_calls.length > 0) {
+        return "retrieve";
+      }
+      // Otherwise proceed to generate
+      return "generate";
+    },
     {
       retrieve: "retrieve",
       generate: "generate"
@@ -181,12 +239,16 @@ async function runRagAgent() {
 
   console.log(`Query: ${query}`);
 
-  // Run the agent
-  const result = await app.invoke({
-    messages: [{ role: "user", content: query }]
-  });
+  try {
+    // Run the agent
+    const result = await app.invoke({
+      messages: [{ role: "user", content: query }]
+    });
 
-  console.log("Response:", result.messages[result.messages.length - 1].content);
+    console.log("Response:", result.messages[result.messages.length - 1].content);
+  } catch (error) {
+    console.error("Error running RAG agent:", error);
+  }
 }
 
 // Run the agent if this file is executed directly

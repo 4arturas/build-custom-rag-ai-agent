@@ -7,6 +7,7 @@ import { ToolNode } from "@langchain/langgraph/prebuilt";
 
 // Import document processing functions
 import { loadDocumentsFromUrls, splitDocuments, createVectorStore } from "./documents.js";
+import { gradeDocuments } from "./grader.js";
 
 // Define the state structure for our RAG agent
 const StateAnnotation = {
@@ -49,18 +50,13 @@ async function shouldRetrieve(state) {
 }
 
 // Function to grade document relevance
-async function gradeDocuments(state) {
-  // For this implementation, we'll implement a simple relevance check
-  // In a real implementation, this would use an LLM to evaluate document relevance
+async function gradeDocumentsNode(state) {
   const { keys, messages } = state;
   const question = messages[messages.length - 1].content;
   const documents = keys.documents || [];
 
-  // Mark all documents as relevant for this simple implementation
-  const filteredDocs = documents.map(doc => ({
-    ...doc,
-    relevance: "yes"
-  }));
+  // Use the imported grading function to filter relevant documents
+  const filteredDocs = await gradeDocuments(question, documents);
 
   return { keys: { filtered_docs: filteredDocs } };
 }
@@ -157,7 +153,7 @@ async function retrieve(state) {
 const workflow = new StateGraph(StateAnnotation)
   .addNode("agent", agent)
   .addNode("retrieve", retrieve)
-  .addNode("gradeDocuments", gradeDocuments)
+  .addNode("gradeDocuments", gradeDocumentsNode)
   .addNode("generate", generate)
   .addNode("rewrite", rewrite)
   .addEdge(START, "agent")

@@ -1,0 +1,23 @@
+{
+  "name": "build-custom-rag-ai-agent",
+  "version": "1.0.0",
+  "description": "Custom RAG AI Agent using Deno, LangChain, and Ollama",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["rag", "ai", "langchain", "ollama", "deno"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^0.2.20",
+    "@langchain/llms": "^0.2.4",
+    "@langchain/core": "^0.2.11",
+    "@langchain/langgraph": "^0.0.21",
+    "langchain": "^0.2.5",
+    "@langchain/ollama": "^0.0.3",
+    "cheerio": "^1.0.0-rc.12",
+    "zod": "^3.23.8"
+  }
+}

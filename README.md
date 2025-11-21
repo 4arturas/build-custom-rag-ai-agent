@@ -118,10 +118,14 @@ Multiple nodes (functions) for discrete workflow parts:
 ## Quick Start
 
 1. Make sure Ollama is running: `ollama serve`
-2. Pull required models: `ollama pull llama3.2` and `ollama pull mxbai-embed-large`
-3. Install dependencies: `npm install @langchain/community @langchain/llms langchain @langchain/core @langchain/langgraph cheerio @langchain/ollama zod`
-4. Create your `index.js` file based on the tutorial
-5. Run the application: `node index.js`
+2. Pull required models:
+   ```bash
+   ollama pull llama3.2:3b
+   ollama pull mxbai-embed-large
+   ollama pull deepseek-r1:8b
+   ```
+3. Install dependencies: `npm install`
+4. Run the application: `npm start` or `node index.js`
 
 ## Notes
 

@@ -15,16 +15,11 @@ async function simpleRagExample(userQuestion) {
   const loader = new CheerioWebBaseLoader(DOCUMENT_URL);
   const docs = await loader.load();
 
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 50,
-  });
+  const splitter = new RecursiveCharacterTextSplitter( { chunkSize: 500, chunkOverlap: 50 });
   const splits = await splitter.splitDocuments(docs);
 
   console.log("2. EMBED: Converting text to searchable vectors...");
-  const embeddings = new OllamaEmbeddings({
-    model: EMBEDDING_MODEL,
-  });
+  const embeddings = new OllamaEmbeddings({ model: EMBEDDING_MODEL });
 
   // const vectorStore = await HNSWLib.fromDocuments(splits, embeddings);
   // const retriever = vectorStore.asRetriever();
@@ -42,10 +37,7 @@ async function simpleRagExample(userQuestion) {
     `Answer based on context:\n\n{context}\n\nQuestion: {question}`
   );
 
-  const model = new ChatOllama({
-    model: LLM_MODEL,
-    temperature: 0
-  });
+  const model = new ChatOllama({ model: LLM_MODEL, temperature: 0 });
 
   const chain = prompt.pipe(model);
   const response = await chain.invoke({

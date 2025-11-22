@@ -19,12 +19,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@langchain/community": "^0.2.20",
-    "@langchain/core": "^0.2.11",
-    "@langchain/langgraph": "^0.0.21",
-    "@langchain/ollama": "^0.0.3",
+    "@langchain/community": "^1.0.4",
+    "@langchain/core": "^1.0.6",
+    "@langchain/langgraph": "^1.0.2",
+    "@langchain/ollama": "^1.0.1",
     "cheerio": "^1.0.0-rc.12",
-    "langchain": "^0.2.5",
+    "hnswlib-node": "^3.0.0",
+    "langchain": "^1.0.6",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.25.0"
   }

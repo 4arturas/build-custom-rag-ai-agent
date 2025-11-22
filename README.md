@@ -1,3 +1,7 @@
+```sh
+npm install -g @google/gemini-cli
+````
+
 # Build Custom RAG AI Agent
 
 This project follows the tutorials from Deno's blog on building custom RAG AI agent using Deno, Llama, and Ollama.
@@ -130,3 +134,68 @@ Multiple nodes (functions) for discrete workflow parts:
 ## Notes
 
 The RAG approach combines the power of large language models with your own data, allowing for more accurate and context-aware responses. The implementation follows a specific workflow pattern: decides to retrieve → retrieves documents → grades relevance → rewrites query if needed → generates final response, creating a sophisticated retrieval-augmented generation system.
+
+## Usage Guide
+
+### Step-by-Step Instructions
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Verify Ollama is Running**
+   ```bash
+   ollama serve
+   ```
+
+3. **Run the Application**
+   ```bash
+   npm start
+   # or
+   node index.js
+   ```
+
+### How It Works
+
+The RAG AI agent follows this workflow:
+1. **Input**: User provides a query/question (to be implemented in `index.js`)
+2. **Agent Decision**: Determines if document retrieval is needed
+3. **Retrieve**: Fetches relevant documents using the tool
+4. **Grade**: Evaluates document relevance to the query
+5. **Generate**: Creates a response using relevant documents
+6. **Output**: Returns the final response to the user
+
+### Adding User Input
+
+To enable user input, you need to modify `index.js` to add a query prompt:
+
+```javascript
+import readline from 'readline/promises';
+
+// Inside runRagAgent() function, replace the hardcoded query with:
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+const query = await rl.question('Enter your question: ');
+rl.close();
+```
+
+### Customizing
+
+- **Change Models**: Edit the model names in `index.js`:
+  - `llama3.2:3b` for the main agent
+  - `deepseek-r1:8b` for generation
+  - `mxbai-embed-large` for embeddings
+
+- **Modify Document Sources**: Update URLs in `tools.js` to point to your desired sources.
+
+- **Adjust Chunks**: Modify `chunkSize` and `chunkOverlap` in `documents.js` to change how documents are split.
+
+### Troubleshooting
+
+- **Model not found**: Ensure all required models are downloaded
+- **Connection errors**: Verify Ollama server is running
+- **Memory issues**: Reduce chunk size for large documents

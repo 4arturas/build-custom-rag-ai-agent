@@ -1,33 +1,36 @@
 import { ChatOllama } from "@langchain/ollama";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { StateGraph } from "@langchain/langgraph";
+import { StateGraph, Annotation } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { z } from "zod";
 import readline from 'readline/promises';
-import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage, ToolMessage, BaseMessage } from "@langchain/core/messages";
+import { DynamicTool } from "@langchain/core/tools";
+import { START, END } from "@langchain/langgraph";
 
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { createRetrieverTool } from "langchain/tools/retriever";
+import { OllamaEmbeddings } from "@langchain/ollama";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+
+import MODEL_CONFIG from "./model_constants.js";
 
 // Define the state structure for our RAG workflow (following the tutorial pattern)
-const GraphState = {
-  messages: {
-    value: (x, y) => x.concat(y),
+const GraphState = Annotation.Root({
+  messages: Annotation({
+    reducer: (x, y) => x.concat(y),
     default: () => [],
-  },
-};
+  }),
+});
 
 // Initialize models
 const model = new ChatOllama({
-  model: "llama3.2:3b",
+  model: MODEL_CONFIG.LLM.AGENT,
   temperature: 0,
 });
 
 const generationModel = new ChatOllama({
-  model: "deepseek-r1:8b",
+  model: MODEL_CONFIG.LLM.GENERATION,
   temperature: 0,
 });
 
@@ -61,7 +64,7 @@ async function createRetriever() {
 
     // Create embeddings
     const embeddings = new OllamaEmbeddings({
-      model: "mxbai-embed-large",
+      model: MODEL_CONFIG.EMBEDDING.DEFAULT,
     });
 
     // Create vector store
@@ -82,13 +85,20 @@ async function createRetriever() {
 async function initializeRetrieverTool() {
   const retriever = await createRetriever();
 
-  return createRetrieverTool(
-    retriever,
-    {
-      name: "search_documents",
-      description: "Search and return information from documents.",
+  // Create a custom tool using LangChain's DynamicTool
+  const retrieverTool = new DynamicTool({
+    name: "search_documents",
+    description: "Search and return information from documents.",
+    func: async ({ query }) => {
+      const results = await retriever.invoke(query);
+      return results.map(r => r.pageContent).join("\n\n");
     },
-  );
+    schema: z.object({
+      query: z.string().describe("The query to search for in the documents"),
+    }),
+  });
+
+  return retrieverTool;
 }
 
 // Agent node that decides the next action
@@ -161,7 +171,7 @@ async function gradeDocuments(state) {
   );
 
   const graderModel = new ChatOllama({
-    model: "llama3.2:3b",
+    model: MODEL_CONFIG.LLM.AGENT,
     temperature: 0,
   }).bindTools([relevanceTool]);
 

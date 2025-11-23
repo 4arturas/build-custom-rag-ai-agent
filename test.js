@@ -4,11 +4,12 @@ import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+import MODEL_CONFIG from "./model_constants.js";
 
 
-const MODEL_EMBEDDING = "mxbai-embed-large";
-const MODEL_LLM = "llama3.2:3b";
-const DOCUMENT_URL = "https://en.wikipedia.org/wiki/Artificial_intelligence";
+const MODEL_EMBEDDING = MODEL_CONFIG.EMBEDDING.DEFAULT;
+const MODEL_LLM = MODEL_CONFIG.LLM.DEFAULT;
+const DOCUMENT_URL = MODEL_CONFIG.DOCUMENT_RETRIEVAL.URL;
 
 async function test()
 {

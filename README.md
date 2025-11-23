@@ -32,8 +32,8 @@ This project demonstrates how to create a custom RAG (Retrieval-Augmented Genera
 
 ## References
 
-- [The Dino, Llama, and Whale: AI Stack for Deno](https://deno.com/blog/the-dino-llama-and-whale)
-- [Build Custom RAG AI Agent](https://deno.com/blog/build-custom-rag-ai-agent)
+https://deno.com/blog/the-dino-llama-and-whale
+https://deno.com/blog/build-custom-rag-ai-agent
 
 ## Setup
 

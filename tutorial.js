@@ -4,10 +4,11 @@ import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+import MODEL_CONFIG from "./model_constants.js";
 
-const EMBEDDING_MODEL = "mxbai-embed-large";
-const LLM_MODEL = "llama3.2:3b";
-const DOCUMENT_URL = "https://en.wikipedia.org/wiki/Artificial_intelligence";
+const EMBEDDING_MODEL = MODEL_CONFIG.EMBEDDING.DEFAULT;
+const LLM_MODEL = MODEL_CONFIG.LLM.DEFAULT;
+const DOCUMENT_URL = MODEL_CONFIG.DOCUMENT_RETRIEVAL.URL;
 
 async function simpleRagExample(userQuestion) {
   console.log("1. RETRIEVE: Loading and processing documents...");

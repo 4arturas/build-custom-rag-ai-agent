@@ -1,4 +1,3 @@
-// Import required modules from LangChain and LangGraph
 import { ChatOllama } from "@langchain/ollama";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StateGraph } from "@langchain/langgraph";
@@ -7,7 +6,6 @@ import { z } from "zod";
 import readline from 'readline/promises';
 import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 
-// Import modules needed for document processing
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
@@ -218,7 +216,8 @@ async function rewrite(state) {
   const question = messages[0].content;
 
   const prompt = PromptTemplate.fromTemplate(
-    `Look at the input and try to reason about the underlying semantic intent / meaning.
+    `
+Look at the input and try to reason about the underlying semantic intent / meaning.
 
 Here is the initial question:
 
@@ -255,7 +254,8 @@ async function generate(state) {
   const context = lastToolMessage.content;
 
   const prompt = PromptTemplate.fromTemplate(
-    `You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+    `
+You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
 
 Here is the initial question:
 

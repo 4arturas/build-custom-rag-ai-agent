@@ -84,12 +84,22 @@ node index.js
 
 ## File Structure
 
-You'll need to create the following files for the complete implementation:
+The project includes the following files and directories:
 
 ```
 project-root/
 ├── package.json
 ├── index.js          # Main application file
+├── documents.js      # Document processing module (placeholder)
+├── tools.js          # Tool integration module (placeholder)
+├── grader.js         # Document relevance grading module (placeholder)
+├── tutorial.js       # Simple RAG example
+├── test.js           # Test implementation
+├── TOOLS_TUTORIAL.md # Tutorial on using tools in the RAG agent
+├── tools/            # Directory containing tool examples
+│   ├── simple_tool_demo.js
+│   ├── rag_agent_with_tools.js
+│   └── tool_example.js
 └── documents/        # Optional: for storing local documents
 ```
 

@@ -22,8 +22,8 @@ async function test()
     const question = "What is AI?";
     const relevantDocs = await retriever.invoke( question );
     const context = relevantDocs.map( doc => doc.pageContent ).join("\n");
-    const prompt = PromptTemplate.fromTemplate("Answer based on context: {context} Question: {question}");
     const model = new ChatOllama({model:MODEL_LLM,temperature:0});
+    const prompt = PromptTemplate.fromTemplate("Answer based on context: {context} Question: {question}");
     const chain = await prompt.pipe( model );
     const response = await chain.invoke({context,question});
     console.log( response.content );
